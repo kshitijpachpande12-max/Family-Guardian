@@ -1,0 +1,30 @@
+{
+  "name": "family-guardian-server",
+  "version": "1.0.0",
+  "description": "Family Guardian API server",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "jest --verbose",
+    "seed": "node src/scripts/seed.js",
+    "evaluate": "node src/scripts/evaluate.js"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4",
+    "nodemailer": "^10.3.1"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.14"
+  }
+}
