@@ -1,0 +1,162 @@
+[
+  {
+    "id": "SCAM-01",
+    "type": "scam",
+    "category": "tech_support_refund",
+    "payee": "Geek Squad Refund Dept",
+    "amount": 499.99,
+    "reason": "Accidental refund overpayment for antivirus renewal, please wire back the difference immediately via AnyDesk."
+  },
+  {
+    "id": "SCAM-02",
+    "type": "scam",
+    "category": "grandparent_bail",
+    "payee": "County Jail Bail Bondsman",
+    "amount": 2200.00,
+    "reason": "Grandson was in a car accident and is in jail. Needs bail money right now, don't tell his mother."
+  },
+  {
+    "id": "SCAM-03",
+    "type": "scam",
+    "category": "gift_card_utility",
+    "payee": "Electric Power Disconnect Unit",
+    "amount": 350.00,
+    "reason": "Power will be cut off within an hour unless settled immediately using Target gift card codes."
+  },
+  {
+    "id": "SCAM-04",
+    "type": "scam",
+    "category": "irs_authority_threat",
+    "payee": "Internal Revenue Service Agent Miller",
+    "amount": 1850.00,
+    "reason": "Outstanding tax penalty warrant issued for arrest. Wire transfer required immediately to cancel police order."
+  },
+  {
+    "id": "SCAM-05",
+    "type": "scam",
+    "category": "lottery_advance_fee",
+    "payee": "Mega Millions Payout Commission",
+    "amount": 750.00,
+    "reason": "Claiming $2.5 Million lottery prize. Must pay customs tax processing fee via Western Union before disbursement."
+  },
+  {
+    "id": "SCAM-06",
+    "type": "scam",
+    "category": "remote_access_security",
+    "payee": "Microsoft Windows Security Center",
+    "amount": 899.00,
+    "reason": "Virus detected on computer. TeamViewer technician cleaned malware and unlocked frozen account."
+  },
+  {
+    "id": "SCAM-07",
+    "type": "scam",
+    "category": "crypto_safe_account",
+    "payee": "Fraud Prevention Vault Transfer",
+    "amount": 3000.00,
+    "reason": "Bank account compromised by hackers. Transfer funds immediately to safe Bitcoin crypto ATM deposit."
+  },
+  {
+    "id": "SCAM-08",
+    "type": "scam",
+    "category": "romance_emergency",
+    "payee": "Captain James Davis",
+    "amount": 1200.00,
+    "reason": "Deployment medical emergency in Turkey. Need urgent funds for hospital surgery, please keep this secret."
+  },
+  {
+    "id": "SCAM-09",
+    "type": "scam",
+    "category": "social_security_threat",
+    "payee": "Social Security Administration Enforcement",
+    "amount": 950.00,
+    "reason": "SSN suspended due to suspicious drug trafficking activity in Texas. Pay clearance bond to avoid FBI detention."
+  },
+  {
+    "id": "SCAM-10",
+    "type": "scam",
+    "category": "apple_card_granddaughter",
+    "payee": "Sarah's College Dorm Emergency",
+    "amount": 500.00,
+    "reason": "Lost my phone and stranded at airport. Please send Apple gift cards immediately so I can buy tickets home."
+  },
+  {
+    "id": "LEGIT-01",
+    "type": "legitimate",
+    "category": "utilities",
+    "payee": "Duke Energy",
+    "amount": 132.45,
+    "reason": "Monthly electric utility bill for October."
+  },
+  {
+    "id": "LEGIT-02",
+    "type": "legitimate",
+    "category": "home_maintenance",
+    "payee": "Bob's Lawn Mowing & Garden Care",
+    "amount": 60.00,
+    "reason": "Bi-weekly front and back yard grass mowing and edging."
+  },
+  {
+    "id": "LEGIT-03",
+    "type": "legitimate",
+    "category": "family_gift",
+    "payee": "Emma Miller",
+    "amount": 100.00,
+    "reason": "Happy 20th Birthday Emma! Love, Grandma."
+  },
+  {
+    "id": "LEGIT-04",
+    "type": "legitimate",
+    "category": "healthcare_pharmacy",
+    "payee": "CVS Pharmacy Store #4821",
+    "amount": 42.18,
+    "reason": "Blood pressure and heart medication copay prescription refill."
+  },
+  {
+    "id": "LEGIT-05",
+    "type": "legitimate",
+    "category": "telecom_internet",
+    "payee": "Comcast Xfinity",
+    "amount": 79.99,
+    "reason": "Home broadband internet and landline phone bundle."
+  },
+  {
+    "id": "LEGIT-06",
+    "type": "legitimate",
+    "category": "home_repair",
+    "payee": "Miller Plumbing LLC",
+    "amount": 185.00,
+    "reason": "Fixed leaking pipe under the kitchen sink and replaced valve."
+  },
+  {
+    "id": "LEGIT-07",
+    "type": "legitimate",
+    "category": "community_charity",
+    "payee": "Grace Community Church",
+    "amount": 50.00,
+    "reason": "Weekly Sunday donation and food pantry contribution."
+  },
+  {
+    "id": "LEGIT-08",
+    "type": "legitimate",
+    "category": "groceries",
+    "payee": "Instacart Shopper Service",
+    "amount": 84.30,
+    "reason": "Weekly grocery delivery from Safeway: milk, eggs, bread, and fruits."
+  },
+  {
+    "id": "LEGIT-09",
+    "type": "legitimate",
+    "category": "hobby_subscription",
+    "payee": "Reader's Digest Association",
+    "amount": 29.95,
+    "reason": "Annual large-print magazine subscription renewal."
+  },
+  {
+    "id": "LEGIT-10",
+    "type": "legitimate",
+    "category": "medical_vision",
+    "payee": "Dr. Henderson Optometry",
+    "amount": 125.00,
+    "reason": "Annual eye examination and reading glasses lens adjustment."
+  }
+]

@@ -13,6 +13,7 @@ const Payment = require('../models/Payment');
 const User = require('../models/User');
 const { authenticate, authorize } = require('../middleware/auth');
 const { transition, PAYMENT_STATES, PAYMENT_EVENTS } = require('../lib/stateMachine');
+const { scorePayment } = require('../lib/riskEngine');
 
 const router = express.Router();
 
@@ -34,7 +35,8 @@ router.post('/', authorize('senior'), async (req, res) => {
       return res.status(400).json({ error: 'Amount must be positive.' });
     }
 
-    const payment = await Payment.create({
+    // 1. Create payment in PENDING state
+    const payment = new Payment({
       senior: req.user._id,
       payee,
       amount,
@@ -49,12 +51,44 @@ router.post('/', authorize('senior'), async (req, res) => {
       }]
     });
 
-    // TODO (Phase 2): Trigger risk scoring here
-    // For now, we'll leave it in PENDING state
+    // 2. Fetch past payment payees for this senior to detect new payees
+    const pastPayments = await Payment.find({ senior: req.user._id })
+      .select('payee')
+      .lean();
 
+    // 3. Evaluate risk using our Hybrid Scoring Engine (Rules + Gemini Flash)
+    const scoring = await scorePayment(
+      { payee, amount, reason },
+      pastPayments
+    );
+
+    // 4. Transition state machine based on score (SCORE_LOW or SCORE_HIGH)
+    const nextState = transition(payment.status, scoring.event);
+
+    payment.status = nextState;
+    payment.riskScore = scoring.riskScore;
+    payment.riskLevel = scoring.riskLevel;
+    payment.riskExplanation = scoring.riskExplanation;
+    payment.scamType = scoring.scamType;
+    payment.ruleFlags = scoring.ruleFlags;
+
+    payment.auditLog.push({
+      action: 'SCORED',
+      fromState: PAYMENT_STATES.PENDING,
+      toState: nextState,
+      performedBy: req.user._id,
+      note: `Scored ${scoring.riskScore}/100 (${scoring.riskLevel} risk). ${scoring.decision}. ${scoring.riskExplanation}`
+    });
+
+    await payment.save();
+
+    // Response includes status and plain-language explanation
     res.status(201).json({
-      message: 'Payment request submitted.',
-      payment
+      message: scoring.decision === 'HELD'
+        ? 'Payment held for guardian review due to elevated risk.'
+        : 'Payment scored low risk and auto-approved.',
+      payment,
+      scoringDetails: scoring.breakdown
     });
   } catch (err) {
     console.error('Payment creation error:', err);
