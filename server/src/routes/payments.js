@@ -14,6 +14,7 @@ const User = require('../models/User');
 const { authenticate, authorize } = require('../middleware/auth');
 const { transition, PAYMENT_STATES, PAYMENT_EVENTS } = require('../lib/stateMachine');
 const { scorePayment } = require('../lib/riskEngine');
+const { releasePayment } = require('../lib/paypalClient');
 
 const router = express.Router();
 
@@ -80,13 +81,41 @@ router.post('/', authorize('senior'), async (req, res) => {
       note: `Scored ${scoring.riskScore}/100 (${scoring.riskLevel} risk). ${scoring.decision}. ${scoring.riskExplanation}`
     });
 
+    // 5. If AUTO_APPROVED (low risk), immediately release payment via PayPal
+    if (nextState === PAYMENT_STATES.AUTO_APPROVED) {
+      try {
+        const paypalResult = await releasePayment(payment);
+        const finalState = transition(payment.status, PAYMENT_EVENTS.PAYMENT_SUCCESS);
+        payment.status = finalState;
+        payment.paypalOrderId = paypalResult.orderId;
+        payment.auditLog.push({
+          action: 'PAYMENT_SUCCESS',
+          fromState: PAYMENT_STATES.AUTO_APPROVED,
+          toState: finalState,
+          performedBy: req.user._id,
+          note: `PayPal sandbox order ${paypalResult.orderId} captured (${paypalResult.isMock ? 'simulator' : 'live-sandbox'}).`
+        });
+      } catch (paypalErr) {
+        console.error('PayPal auto-release failed:', paypalErr);
+        const failState = transition(payment.status, PAYMENT_EVENTS.PAYMENT_FAIL);
+        payment.status = failState;
+        payment.auditLog.push({
+          action: 'PAYMENT_FAIL',
+          fromState: PAYMENT_STATES.AUTO_APPROVED,
+          toState: failState,
+          performedBy: req.user._id,
+          note: `PayPal sandbox release error: ${paypalErr.message}`
+        });
+      }
+    }
+
     await payment.save();
 
     // Response includes status and plain-language explanation
     res.status(201).json({
       message: scoring.decision === 'HELD'
         ? 'Payment held for guardian review due to elevated risk.'
-        : 'Payment scored low risk and auto-approved.',
+        : `Payment scored low risk and processed via PayPal (${payment.status}).`,
       payment,
       scoringDetails: scoring.breakdown
     });
@@ -178,7 +207,7 @@ router.post('/:id/approve', authorize('guardian'), async (req, res) => {
     // Use state machine to validate the transition
     const newState = transition(payment.status, PAYMENT_EVENTS.GUARDIAN_APPROVE);
 
-    // Update payment
+    // Update payment to APPROVED
     payment.status = newState;
     payment.auditLog.push({
       action: 'GUARDIAN_APPROVE',
@@ -188,12 +217,38 @@ router.post('/:id/approve', authorize('guardian'), async (req, res) => {
       note: req.body.note || 'Guardian approved this payment.'
     });
 
+    // Execute PayPal payment release
+    try {
+      const paypalResult = await releasePayment(payment);
+      const finalState = transition(payment.status, PAYMENT_EVENTS.PAYMENT_SUCCESS);
+      payment.status = finalState;
+      payment.paypalOrderId = paypalResult.orderId;
+      payment.auditLog.push({
+        action: 'PAYMENT_SUCCESS',
+        fromState: PAYMENT_STATES.APPROVED,
+        toState: finalState,
+        performedBy: req.user._id,
+        note: `Guardian approved. PayPal sandbox order ${paypalResult.orderId} captured (${paypalResult.isMock ? 'simulator' : 'live-sandbox'}).`
+      });
+    } catch (paypalErr) {
+      console.error('PayPal release on approval failed:', paypalErr);
+      const failState = transition(payment.status, PAYMENT_EVENTS.PAYMENT_FAIL);
+      payment.status = failState;
+      payment.auditLog.push({
+        action: 'PAYMENT_FAIL',
+        fromState: PAYMENT_STATES.APPROVED,
+        toState: failState,
+        performedBy: req.user._id,
+        note: `PayPal release failed: ${paypalErr.message}`
+      });
+    }
+
     await payment.save();
 
-    // TODO (Phase 3): Trigger PayPal payment here
-
     res.json({
-      message: 'Payment approved by guardian.',
+      message: payment.status === PAYMENT_STATES.COMPLETED
+        ? 'Payment approved and funds successfully disbursed via PayPal.'
+        : 'Payment approved by guardian, but PayPal transfer failed.',
       payment
     });
   } catch (err) {
