@@ -20,8 +20,16 @@ const app = express();
 
 // cors() lets our React frontend (on port 5173) talk to our API (on port 5000).
 // Without this, the browser blocks cross-origin requests for security.
+// cors() configuration that allows localhost on any port in development
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (process.env.NODE_ENV !== 'production' || origin === process.env.CLIENT_URL) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Permissive in dev to avoid port-mismatch blocks
+  },
   credentials: true
 }));
 

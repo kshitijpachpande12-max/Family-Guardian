@@ -50,13 +50,12 @@ const userSchema = new mongoose.Schema({
 // "Pre-save" means this runs BEFORE mongoose saves the document.
 // bcrypt turns "password123" into "$2a$10$X7..." (irreversible hash).
 // Even if someone steals the database, they can't read passwords.
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // Only hash if the password field was modified (not on every save)
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return;
 
   const salt = await bcrypt.genSalt(10);   // 10 rounds of salting
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // --- Instance method: compare a plaintext password to the hash ---

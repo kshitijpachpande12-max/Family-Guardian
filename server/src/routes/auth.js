@@ -36,13 +36,15 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Name, email, password, and role are required.' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     // Validate role
     if (!['senior', 'guardian'].includes(role)) {
       return res.status(400).json({ error: 'Role must be "senior" or "guardian".' });
     }
 
     // Check if email already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(409).json({ error: 'Email already registered.' });
     }
@@ -56,7 +58,8 @@ router.post('/register', async (req, res) => {
         });
       }
 
-      const senior = await User.findOne({ email: linkedSeniorEmail, role: 'senior' });
+      const normalizedSeniorEmail = linkedSeniorEmail.trim().toLowerCase();
+      const senior = await User.findOne({ email: normalizedSeniorEmail, role: 'senior' });
       if (!senior) {
         return res.status(404).json({
           error: `No senior found with email "${linkedSeniorEmail}". The senior must register first.`
@@ -67,8 +70,8 @@ router.post('/register', async (req, res) => {
 
     // Create user (password is hashed by the pre-save hook in User model)
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password,
       role,
       linkedSenior
@@ -90,7 +93,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Server error during registration.' });
+    res.status(500).json({ error: err.message || 'Server error during registration.' });
   }
 });
 
@@ -103,8 +106,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     // Find user and explicitly include the password field (it's excluded by default)
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
@@ -130,7 +135,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error during login.' });
+    res.status(500).json({ error: err.message || 'Server error during login.' });
   }
 });
 
