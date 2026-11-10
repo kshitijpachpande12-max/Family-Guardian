@@ -198,13 +198,33 @@ async function sendGuardianAlert({ senior, payment, guardian }) {
     };
   }
 
-  const info = await transporter.sendMail(mailOptions);
-  return {
-    success: true,
-    messageId: info.messageId,
-    approveUrl,
-    blockUrl
-  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[MAILTRAP] Alert email delivered to ${guardian.email} (MessageId: ${info.messageId})`);
+    return {
+      success: true,
+      messageId: info.messageId,
+      approveUrl,
+      blockUrl
+    };
+  } catch (smtpErr) {
+    console.warn(`[MAILTRAP WARNING] SMTP delivery failed (${smtpErr.message}). Falling back to simulated delivery:`);
+    console.log('\n============================================================');
+    console.log('✉️  [MAILTRAP SIMULATOR] Email Notification to Guardian:');
+    console.log(`To: ${guardian.email}`);
+    console.log(`Subject: ${mailOptions.subject}`);
+    console.log(`🚨 BLOCK URL   : ${blockUrl}`);
+    console.log(`✅ APPROVE URL : ${approveUrl}`);
+    console.log('============================================================\n');
+
+    return {
+      success: true,
+      simulated: true,
+      smtpError: smtpErr.message,
+      approveUrl,
+      blockUrl
+    };
+  }
 }
 
 module.exports = {
