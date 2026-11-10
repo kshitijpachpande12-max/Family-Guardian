@@ -48,26 +48,26 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Connect to MongoDB on demand (serverless-friendly)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGODB_URI);
+  }
+  next();
+});
+
 // --- Routes ---
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/payments', require('./routes/payments'));
 
 // --- Connect to MongoDB and Start Server ---
 const PORT = process.env.PORT || 5000;
-
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`🛡️  Family Guardian API running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err.message);
-    // Start server anyway so health check works during development
-    app.listen(PORT, () => {
-      console.log(`⚠️  Server running on port ${PORT} (no database)`);
-    });
-  });
-
-module.exports = app; // Export for testing
+if (require.main === module) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('✅ Connected to MongoDB');
+      app.listen(PORT, () => console.log(`🛡️ Family Guardian API running on port ${PORT}`));
+    })
+    .catch(err => console.error('❌ MongoDB connection error:', err.message));
+}
+module.exports = app;
