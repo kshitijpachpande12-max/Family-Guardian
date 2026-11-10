@@ -1,39 +1,78 @@
-// =============================================
-// Family Guardian - React App Entry Point
-// =============================================
-// This is the root component of our React app.
-// For now, it's a simple placeholder that proves
-// the frontend is running and can talk to the API.
-// =============================================
+// ================================================
+// Family Guardian - Main Application Router
+// ================================================
 
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Navbar from './components/Navbar';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import SeniorPortal from './pages/SeniorPortal';
+import GuardianConsole from './pages/GuardianConsole';
 import './App.css';
 
-function App() {
-  const [apiStatus, setApiStatus] = useState('checking...');
+// Guard for protected routes
+function ProtectedRoute({ children, allowedRole }) {
+  const { user, loading } = useAuth();
 
-  // useEffect runs once when the component mounts (loads).
-  // We use it to ping our backend health endpoint.
-  useEffect(() => {
-    fetch('http://localhost:5000/api/health')
-      .then(res => res.json())
-      .then(data => setApiStatus(data.status))
-      .catch(() => setApiStatus('offline'));
-  }, []);
+  if (loading) {
+    return (
+      <div className="app-loading-screen">
+        <div className="spinner"></div>
+        <p>Verifying Family Guardian security session...</p>
+      </div>
+    );
+  }
 
-  return (
-    <div className="app">
-      <header className="app-header">
-        <h1>🛡️ Family Guardian</h1>
-        <p>AI-assisted payment protection for elderly users</p>
-        <div className="status-badge">
-          API Status: <span className={apiStatus === 'ok' ? 'status-ok' : 'status-err'}>
-            {apiStatus}
-          </span>
-        </div>
-      </header>
-    </div>
-  );
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRole && user.role !== allowedRole) {
+    return <Navigate to={user.role === 'senior' ? '/senior' : '/guardian'} replace />;
+  }
+
+  return children;
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="app-wrapper">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              {/* Protected Senior Route */}
+              <Route
+                path="/senior"
+                element={
+                  <ProtectedRoute allowedRole="senior">
+                    <SeniorPortal />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Guardian Route */}
+              <Route
+                path="/guardian"
+                element={
+                  <ProtectedRoute allowedRole="guardian">
+                    <GuardianConsole />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

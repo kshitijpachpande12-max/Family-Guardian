@@ -8,6 +8,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const dns = require('dns');
+try { dns.setServers(['8.8.8.8', '8.8.4.4']); } catch (e) {}
 require('dotenv').config();
 
 const app = express();
