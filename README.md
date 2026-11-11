@@ -12,7 +12,7 @@ Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/).
 | | |
 |---|---|
 | 🌐 **Live demo** | https://family-guardian-wjks.vercel.app |
-| 🎬 **Demo video** | `ADD_YOUR_YOUTUBE_URL` |
+| 🎬 **Demo video** | https://youtu.be/5FJpoH70sJI |
 | 💻 **Source** | https://github.com/kshitijpachpande12-max/Family-Guardian |
 
 > **Sandbox only.** This project uses the PayPal **Sandbox** and Mailtrap's test inbox. No real money moves and no real emails are sent.
