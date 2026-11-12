@@ -28,7 +28,7 @@ app.use(cors({
     if (process.env.NODE_ENV !== 'production' || origin === process.env.CLIENT_URL) {
       return callback(null, true);
     }
-    return callback(null, true); // Permissive in dev to avoid port-mismatch blocks
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true
 }));
