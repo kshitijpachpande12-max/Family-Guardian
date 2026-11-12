@@ -234,6 +234,30 @@ cd client && npm run dev
 Open http://localhost:5173.
 
 ---
+ 
+## 🔑 Try it now: 2 demo accounts
+ 
+Open the [live demo](https://family-guardian-wjks.vercel.app) and log in with either account. Use **both** (for example in two browser windows) to see the full flow. Eleanor sends the payment, and David, her guardian, approves or blocks it.
+ 
+| Role | Name | Email | Password |
+|---|---|---|---|
+| 👵 **Senior** | Eleanor Vance | `eleanor@guardian.demo` | `password123` |
+| 👨 **Guardian** | David Vance | `david@guardian.demo` | `password123` |
+ 
+David's account is linked to Eleanor's, so he receives and can act on her held payments. The accounts come with sample history: a completed utility payment, a scam payment that was blocked, and a high-risk payment that is **currently held and waiting for the guardian's decision**.
+ 
+**Quick 2-minute test**
+1. Log in as **David (guardian)** and open the held "County Court Bail Bondsman" payment. Read the AI explanation, then **Approve** or **Block** it.
+2. Log in as **Eleanor (senior)** and submit a normal payment, such as a small amount to a known payee. It is auto-approved.
+3. As Eleanor, submit an urgent request, for example gift cards demanded to pay a bail, with a note not to tell the family. It is **held**.
+4. Switch back to David and decide on it.
+> These are public demo accounts on a sandbox database. Please don't enter real personal or payment details.
+ 
+---
+
+---
+
+
 
 ## 🎬 Try the demo flow
 
